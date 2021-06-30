@@ -1,0 +1,29 @@
+language: php
+
+php:
+- 7.1
+- 7.2
+- 7.3
+- 7.4
+
+sudo: false
+
+cache:
+  directories:
+  - $HOME/.composer/cache
+
+matrix:
+  fast_finish: true
+  include:
+  - php: 7.1
+    dist: trusty
+
+before_install:
+- composer self-update
+- composer clear-cache
+
+install:
+- composer update --no-interaction --no-ansi --optimize-autoloader --prefer-dist
+
+script:
+- vendor/bin/phpunit --coverage-text --exclude-group api-call

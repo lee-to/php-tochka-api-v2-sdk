@@ -1,0 +1,4 @@
+vendor/
+examples/
+composer.lock
+tests/TochkaTestCredentials.php
