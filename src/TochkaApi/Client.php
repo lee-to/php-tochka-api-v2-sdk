@@ -176,18 +176,16 @@ final class Client
     {
         return static::HOST . "/connect/token";
     }
-
-    /**
-     * @param string $jwt
-     * @return string
-     */
-    public function generateAuthorizeUrl($jwt)
+    
+    public function generateAuthorizeUrlByParams(string $consentId, ?string $state = null): string
     {
         $data = [
             "client_id" => $this->getClientId(),
-            "redirect_uri" => $this->getRedirectUri(),
-            "request" => $jwt,
             "response_type" => "code",
+            "state" => $state ?: uniqid(),
+            "redirect_uri" => $this->getRedirectUri(),
+            'scope' => $this->getScopes(),
+            'consent_id' => $consentId,
         ];
 
         return static::HOST . "/connect/authorize?" . http_build_query($data);
@@ -245,7 +243,7 @@ final class Client
      * @return string
      * @throws TochkaApiClientException
      */
-    public function authorize()
+    public function authorize(?string $state = null)
     {
         $data = [
             "client_id" => $this->getClientId(),
@@ -261,9 +259,7 @@ final class Client
             throw new TochkaApiClientException($e->getMessage());
         }
 
-        $jwt = TochkaPermissionsJWT::generateJWT($response["Data"]["consentId"], static::HOST, $this->getClientId(), $this->getRedirectUri(), $this->getScopes());
-
-        return $this->generateAuthorizeUrl($jwt);
+        return $this->generateAuthorizeUrlByParams($response["Data"]["consentId"], $state);
     }
 
     /**
