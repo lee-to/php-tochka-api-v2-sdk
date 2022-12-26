@@ -30,6 +30,11 @@ class Api
     protected $adapter;
 
     /**
+     * @var bool
+     */
+    protected $enableSandbox = false;
+
+    /**
      * @var array $headers
      */
     protected $headers = [];
@@ -44,13 +49,13 @@ class Api
      * @param AccessToken $token
      * @param HttpClientInterface $adapter
      */
-    public function __construct(AccessToken $token, HttpClientInterface $adapter)
+    public function __construct(AccessToken $token, HttpClientInterface $adapter, bool $enableSandbox = false)
     {
         $bearerAuth = new BearerAuth($token);
 
         $this->setBearerAuthHeader($bearerAuth->getHeaders());
-
         $this->setAdapter($adapter);
+        $this->setEnableSandbox($enableSandbox);
     }
 
     /**
@@ -67,6 +72,16 @@ class Api
     protected function setAdapter(HttpClientInterface $adapter)
     {
         $this->adapter = $adapter;
+    }
+
+    protected function isEnableSandbox(): bool
+    {
+        return $this->enableSandbox;
+    }
+
+    protected function setEnableSandbox(bool $enableSandbox): void
+    {
+        $this->enableSandbox = $enableSandbox;
     }
 
     /**
@@ -107,7 +122,9 @@ class Api
      */
     protected function getBaseUrl($type)
     {
-        return static::HOST . "/uapi/" . $type . "/" . static::VERSION;
+        $env = $this->isEnableSandbox() ? '/sandbox/v2/' : '/uapi/';
+
+        return static::HOST . $env . $type . "/" . static::VERSION;
     }
 
     /**

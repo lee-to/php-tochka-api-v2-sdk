@@ -59,6 +59,11 @@ final class Client
     protected $access_token;
 
     /**
+     * @var bool
+     */
+    protected $enableSandbox = false;
+
+    /**
      * @var string $scopes
      */
     protected $scopes = "accounts customers statements cards sbp payments balances";
@@ -87,20 +92,13 @@ final class Client
         "CreatePaymentOrder"
     ];
 
-    /**
-     * TochkaApi constructor.
-     * @param string $client_id
-     * @param string $client_secret
-     * @param string $redirect_uri
-     * @param HttpClientInterface $adapter
-     */
-    public function __construct($client_id, $client_secret, $redirect_uri, HttpClientInterface $adapter)
+    public function __construct(string $client_id, string $client_secret, string $redirect_uri, HttpClientInterface $adapter, bool $enableSandbox = false)
     {
         $this->setClientId($client_id);
         $this->setClientSecret($client_secret);
         $this->setRedirectUri($redirect_uri);
-
         $this->setAdapter($adapter);
+        $this->setEnableSandbox($enableSandbox);
     }
 
     /**
@@ -207,6 +205,16 @@ final class Client
     protected function setAdapter(HttpClientInterface $adapter)
     {
         $this->adapter = $adapter;
+    }
+
+    protected function isEnableSandbox(): bool
+    {
+        return $this->enableSandbox;
+    }
+
+    protected function setEnableSandbox(bool $enableSandbox): void
+    {
+        $this->enableSandbox = $enableSandbox;
     }
 
     /**
@@ -337,7 +345,7 @@ final class Client
             ]
         ];
 
-        $response = (new Api($token, $this->getAdapter()))->permissionsRequest($data);
+        $response = (new Api($token, $this->getAdapter(), $this->isEnableSandbox()))->permissionsRequest($data);
 
         if(!isset($response["Data"]["consentId"])) {
             throw new TochkaApiClientException("Create consents error");
@@ -360,7 +368,7 @@ final class Client
             throw new ModelNotFoundException($name);
         }
 
-        $model = new $className(new Api($this->getAccessToken(), $this->getAdapter()), $arguments[0] ?? null, $arguments[1] ?? null);
+        $model = new $className(new Api($this->getAccessToken(), $this->getAdapter(), $this->isEnableSandbox()), $arguments[0] ?? null, $arguments[1] ?? null);
 
         return $model;
     }
