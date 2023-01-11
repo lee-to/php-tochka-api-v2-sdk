@@ -7,8 +7,6 @@ use TochkaApi\Exceptions\ModelNotFoundException;
 use TochkaApi\Exceptions\TochkaApiClientException;
 use TochkaApi\HttpAdapters\HttpClientInterface;
 use TochkaApi\Models\BaseModel;
-use TochkaApi\Utilities\TochkaPermissionsJWT;
-
 
 /**
  * @method  \TochkaApi\Models\Balance balance($id = null)
