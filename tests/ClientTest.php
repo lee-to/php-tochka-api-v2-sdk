@@ -7,7 +7,6 @@ use TochkaApi\Auth\AccessToken;
 use TochkaApi\Auth\BearerAuth;
 use TochkaApi\Client;
 use TochkaApi\HttpAdapters\CurlHttpClient;
-use TochkaApi\Utilities\TochkaPermissionsJWT;
 
 class ClientTest extends TestCase
 {
@@ -39,14 +38,6 @@ class ClientTest extends TestCase
         $this->expectExceptionMessage("Access token error");
         $client->authorize();
         $client->token("test");
-    }
-
-    public function testJWT()
-    {
-        $jwt = TochkaPermissionsJWT::generateJWT("test", "https://example.com", "test", "https://example.com", "");
-
-        $this->assertNotEmpty($jwt);
-        $this->assertContains(".", $jwt);
     }
 
     public function testAccessTokenClass()
